@@ -1,15 +1,31 @@
 import { EventEmitter } from 'node:events';
 
-export interface CacheOptions {
+export interface CacheStats {
+  hits: number;
+  misses: number;
+  evictions: number;
+}
+
+export type Strategy<V = any> =
+  | 'lru'
+  | 'lfu'
+  | ((store: Map<string, { v: V; exp: number; hits: number }>, max: number) => string | undefined);
+
+export interface CacheOptions<V = any> {
   max?: number;
   ttl?: number;
-  strategy?: 'lru' | 'lfu';
+  strategy?: Strategy<V>;
   adaptive?: boolean;
   persistence?: boolean | string;
+  serializer?: (snapshot: [string, { v: V; exp: number; hits: number }][] ) => string;
+  deserializer?: (raw: string) => [string, { v: V; exp: number; hits: number }][];
+  debounce?: number;
+  evictionRate?: number;
 }
 
 export declare class DorratCache<V = any> extends EventEmitter {
-  constructor(opts?: CacheOptions);
+  static create<V = any>(opts?: CacheOptions<V>): Promise<DorratCache<V>>;
+  constructor(opts?: CacheOptions<V>);
   set(key: string, value: V, ttl?: number): this;
   get(key: string, def?: V): V | undefined;
   has(key: string): boolean;
@@ -20,6 +36,9 @@ export declare class DorratCache<V = any> extends EventEmitter {
   keys(): string[];
   values(): V[];
   entries(): [string, V][];
-  snapshot(): [string, V][];
+  snapshot(): [string, { v: V; exp: number; hits: number }][];
+  with(key: string, factory: () => Promise<V> | V, ttl?: number): Promise<V>;
+  stop(): void;
+  readonly stats: CacheStats;
   [Symbol.iterator](): IterableIterator<[string, V]>;
 }
