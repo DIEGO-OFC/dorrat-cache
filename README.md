@@ -175,9 +175,8 @@ MIT — Hecho con 💖 por [DIEGO-OFC](https://github.com/DIEGO-OFC)
 
 ---
 
-## 📦 Instalar (solo como referencia)
+## 📦 Instalar 
 
-> ⚠️ Ya que no se pidió instalación, omite este bloque si no deseas incluirlo:
 ```bash
 npm install dorrat-cache
 ```
