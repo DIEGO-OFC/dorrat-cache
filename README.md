@@ -33,9 +33,9 @@
 // ESM
 import DorratCache from 'dorrat-cache';
 
-const cache = new DorratCache({
+const cache = await DorratCache.create({
   max: 100,
-  ttl: 60000, // 60s por defecto
+  ttl: 60000,
   strategy: 'lru',
   adaptive: true,
   persistence: './cache.json'
@@ -53,7 +53,7 @@ console.log(cache.get('clave')); // "valor"
 // CommonJS
 const { DorratCache } = require('dorrat-cache');
 
-const cache = new DorratCache({
+const cache = await DorratCache.create({
   max: 100,
   ttl: 60000,
   strategy: 'lfu',
@@ -75,9 +75,13 @@ console.log(cache.get('clave')); // "valor"
 |--------------|-------------------|--------------|-----------------------------------------|
 | `max`        | `number`          | `256`        | Máximo de entradas almacenadas          |
 | `ttl`        | `number` (ms)     | `60000`      | Tiempo de vida por defecto por clave    |
-| `strategy`   | `'lru'` / `'lfu'` | `'lru'`      | Estrategia de eliminación               |
+| `strategy`   | `'lru'` / `'lfu'` / función personalizada | `'lru'`      | Estrategia de eliminación               |
 | `adaptive`   | `boolean`         | `true`       | Aumenta TTL según frecuencia de acceso  |
-| `persistence`| `boolean|string`  | `false`      | Guarda y restaura caché desde disco     |
+| `persistence`| `boolean \| string` | `false`    | Guarda y restaura caché desde disco     |
+| `serializer` | `(data) => string` | `JSON.stringify` | Serializador personalizado          |
+| `deserializer` | `(raw) => data` | `JSON.parse` | Deserializador personalizado        |
+| `debounce`   | `number`           | `500`         | Tiempo de espera para guardar (ms)     |
+| `evictionRate` | `number`        | `1`           | Número de entradas a desalojar extra   |
 
 ---
 
@@ -97,6 +101,20 @@ console.log(cache.get('clave')); // "valor"
 | `entries()`          | Lista de pares `[clave, valor]`                        |
 | `snapshot()`         | Dump actual (serializable) de todo el contenido        |
 | `[Symbol.iterator]`  | Iterador para usar en `for...of`                       |
+| `with(key, fn, ttl?)` | Devuelve valor si existe o lo genera y guarda           |
+| `stop()`              | Detiene el guardado automático                          |
+| `stats`              | Objeto con estadísticas: hits, misses, evictions        |
+
+---
+
+## 📈 Métricas y extensiones
+
+```js
+console.log(cache.stats);
+// { hits: 5, misses: 2, evictions: 1 }
+
+await cache.with('user-123', () => getUserFromDB(), 10000);
+```
 
 ---
 
