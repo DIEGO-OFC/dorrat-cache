@@ -1,7 +1,7 @@
 {
   "name": "dorrat-cache",
-  "version": "2.0.0",
-  "description": "Adaptive in-memory cache with switchable eviction strategies and optional persistence.",
+  "version": "3.0.0",
+  "description": "Ultra-ligero cache in-memory (TTL/LRU/LFU) con persistencia opcional, TTL adaptativo y estrategia pluggable.",
   "author": "DIEGO-OFC",
   "license": "MIT",
   "repository": {
@@ -23,8 +23,8 @@
     "ttl",
     "lru",
     "lfu",
-    "esm",
-    "commonjs"
+    "adaptive",
+    "persist"
   ],
   "files": [
     "esm",
